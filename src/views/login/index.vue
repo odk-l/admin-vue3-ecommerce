@@ -15,7 +15,7 @@
                             show-password></el-input>
                     </el-form-item>
                     <el-form-item>
-                        <el-button :loading="loading" class="login_btn" type="primary" size="default"
+                        <el-button :loading="loading" class="login_btn" type="primary" color="#409EFF" size="default"
                             @click="login">登录</el-button>
                     </el-form-item>
                 </el-form>
