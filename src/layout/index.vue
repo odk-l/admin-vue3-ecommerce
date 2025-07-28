@@ -4,6 +4,9 @@
         <div class="layout_slider">
             <Logo></Logo>
             <!-- 展示菜单 -->
+            <el-scrollbar class="scrollbar">
+                <Menu :menuList="userStore.menuRoutes"></Menu>
+            </el-scrollbar>
             <!-- 滚动组件 -->
             <el-scrollbar class="scrollbar">
                 <!-- 菜单组件-->
@@ -27,6 +30,10 @@
 
 <script setup lang="ts">
 import Logo from '@/layout/Logo/index.vue'
+import Menu from '@/layout/menu/index.vue'
+import useUserStore from '@/store/modules/users';
+
+const userStore = useUserStore()
 
 </script>
 

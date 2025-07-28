@@ -3,12 +3,15 @@ import { defineStore } from "pinia";
 import { reqLogin } from '@/apis/user'
 import type { loginForm, loginResponseData } from "@/apis/user/type";
 import { SET_TOKEN, GET_TOKEN } from "@/utils/token";
+//引入常量路由
+import { routes } from "@/routers";
 
 const useUserStore = defineStore('User', {
     state: () => {
         // define your state properties here, e.g. userInfo: null
         return {
-            token: GET_TOKEN()
+            token: GET_TOKEN(),
+            menuRoutes: routes
         }
     },
     actions: {
