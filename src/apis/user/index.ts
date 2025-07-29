@@ -1,6 +1,6 @@
 //统一管理项目用户相关接口
 import request from "@/utils/request";
-import type { loginForm, loginResponseData } from "./type";
+import type { loginForm, loginResponseData, userResponseData } from "./type";
 
 
 
@@ -9,5 +9,5 @@ export const reqLogin = (data: loginForm) => {
 }
 
 export const reqUserInfo = () => {
-    return request.get<any, loginResponseData>('user/info')
+    return request.get<any, userResponseData>('user/info')
 }

@@ -1,6 +1,6 @@
 //用户相关的小仓库
 import { defineStore } from "pinia";
-import { reqLogin } from '@/apis/user'
+import { reqLogin, reqUserInfo } from '@/apis/user'
 import type { loginForm, loginResponseData } from "@/apis/user/type";
 import { SET_TOKEN, GET_TOKEN } from "@/utils/token";
 //引入常量路由
@@ -11,7 +11,9 @@ const useUserStore = defineStore('User', {
         // define your state properties here, e.g. userInfo: null
         return {
             token: GET_TOKEN(),
-            menuRoutes: routes
+            menuRoutes: routes,
+            username: '',
+            avatar: '',
         }
     },
     actions: {
@@ -29,6 +31,17 @@ const useUserStore = defineStore('User', {
                 return 'ok';
             } else {
                 return Promise.reject(new Error())
+            }
+        },
+
+        /* 获取用户信息 */
+        async userInfo() {
+            //获取用户信息储存在仓库中
+            let result = await reqUserInfo()
+            //如果获取用户信息成功,存储用户信息
+            if (result.code === 200) {
+                this.username = result.data.checkUser.username
+                this.avatar = result.data.checkUser.avatar
             }
         }
     },

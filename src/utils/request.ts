@@ -1,5 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus';
+//引入用户相关仓库
+import useUserStore from '@/store/modules/users';
 
 const request = axios.create({
     baseURL: '/api',
@@ -7,6 +9,12 @@ const request = axios.create({
 })
 
 request.interceptors.request.use((config) => {
+    //获取用户相关的小仓库:获取仓库内部token,登录成功后携带给服务器
+    const userStore = useUserStore()
+    //当然,登录前是没有token的,所以需要判断是否存在token
+    if (userStore.token) {
+        config.headers.token = userStore.token
+    }
 
     return config;
 })

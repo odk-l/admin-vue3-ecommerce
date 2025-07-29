@@ -3,10 +3,11 @@
     <el-button size="small" :icon="FullScreen" circle @click="fullScreen"></el-button>
     <el-button size="small" :icon="Setting" circle></el-button>
     <!-- 头像 -->
+    <img :src="userStore.avatar" style="width: 24px;height: 24px;margin: 0px 10px;border-radius: 50%;">
     <!-- 下拉菜单 -->
     <el-dropdown>
         <span class="el-dropdown-link">
-            admin
+            {{ userStore.username }}
             <el-icon class="el-icon--right">
                 <ArrowDown />
             </el-icon>
@@ -29,6 +30,8 @@ import { FullScreen, Refresh, Setting, ArrowDown } from '@element-plus/icons-vue
 重新创建就会再次进行一次挂载,也就会再次向服务器发送请求 */
 //获取骨架小仓库
 import { useSettingStore } from '@/store/modules/setting';
+//获取用户相关的小仓库
+import useUserStore from '@/store/modules/users';
 
 let SettingStore = useSettingStore()
 /* 刷新按钮点击回调 */
@@ -51,6 +54,8 @@ const fullScreen = () => {
         document.exitFullscreen()
     }
 }
+
+const userStore = useUserStore()
 </script>
 
 <style scoped></style>
