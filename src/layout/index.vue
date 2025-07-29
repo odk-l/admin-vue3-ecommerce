@@ -1,39 +1,47 @@
 <template>
     <div class="layout_container">
         <!-- 左侧菜单 -->
-        <div class="layout_slider">
+        <div class="layout_slider" :class="{ fold: SettingStore.fold ? true : false }">
             <Logo></Logo>
             <!-- 展示菜单 -->
-            <el-scrollbar class="scrollbar">
-                <Menu :menuList="userStore.menuRoutes"></Menu>
-            </el-scrollbar>
             <!-- 滚动组件 -->
             <el-scrollbar class="scrollbar">
                 <!-- 菜单组件-->
-                <el-menu>
+                <el-menu :collapse="SettingStore.fold" :default-active="$route.path" background-color="#001529"
+                    text-color="white">
                     <!--根据路由动态生成菜单-->
-                    <Menu></Menu>
+                    <Menu :menuList="userStore.menuRoutes"></Menu>
                 </el-menu>
             </el-scrollbar>
         </div>
         <!-- 顶部导航 -->
-        <div>
+        <div class="layout_tabbar" :class="{ fold: SettingStore.fold ? true : false }">
             <!-- layout组件的顶部导航tabbar -->
             <Tabbar></Tabbar>
         </div>
+
         <!-- 内容展示区域 -->
-        <div>
+        <div class="layout_main" :class="{ fold: SettingStore.fold ? true : false }">
             <Main></Main>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
+import { useRoute } from 'vue-router';
 import Logo from '@/layout/Logo/index.vue'
 import Menu from '@/layout/menu/index.vue'
 import useUserStore from '@/store/modules/users';
+import Main from '@/layout/main/index.vue'
+/* 引入顶部tabbar组件 */
+import Tabbar from '@/layout/tabbar/index.vue'
+import { useSettingStore } from '@/store/modules/setting';
 
 const userStore = useUserStore()
+
+const $route = useRoute()
+
+const SettingStore = useSettingStore()
 
 </script>
 
@@ -41,6 +49,7 @@ const userStore = useUserStore()
 .layout_container {
     width: 100%;
     height: 100vh;
+    position: fixed;
 
     .layout_slider {
         color: white;
@@ -56,6 +65,10 @@ const userStore = useUserStore()
             .el-menu {
                 border-right: none;
             }
+        }
+
+        &.fold {
+            width: $base-menu-min-width;
         }
     }
 
