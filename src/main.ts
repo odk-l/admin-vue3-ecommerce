@@ -16,7 +16,8 @@ app.use(ElementPlus, {
 app.use(globalComponent)
 app.use(router)
 app.use(pinia)
-
+//引入路由鉴权的文件执行一次
+import './permisstion'
 
 
 
