@@ -56,7 +56,6 @@ const SettingStore = useSettingStore()
         width: $base-menu-width;
         height: 100vh;
         background: $base-menu-background;
-        transition: all 0.3s;
 
         .scrollbar {
             width: 100%;
