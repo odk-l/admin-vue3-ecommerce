@@ -3,6 +3,7 @@ import Home from '@/views/home/index.vue'
 import Login from '@/views/login/index.vue'
 import Error from '@/views/404/index.vue'
 import Layout from '@/layout/index.vue'
+
 // import Screen from '@/views/screen/index.vue'
 
 
@@ -11,7 +12,7 @@ export const routes = [
         path: '/',
         name: 'layout',
         component: Layout,
-        meta: { title: 'layout', hidden: false },
+        meta: { hidden: false, title: '' },
         redirect: '/home',
         children: [
             {
@@ -49,14 +50,15 @@ export const routes = [
             hidden: false,
             icon: 'Lock'
         },
+        redirect: '/acl/user',
         children: [
             {
                 path: '/acl/user',
                 name: 'User',
                 meta: {
-                    title: '权限管理',
+                    title: '用户管理',
                     hidden: false,
-                    icon: 'Lock'
+                    icon: 'User'
                 },
                 component: () => import('@/views/acl/user/index.vue')
             }, {
@@ -100,6 +102,7 @@ export const routes = [
             title: '商品管理',
             icon: 'Goods'
         },
+        redirect: '/product/trademark',
         children: [
             {
                 path: '/product/trademark',
