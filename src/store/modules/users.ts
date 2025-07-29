@@ -2,7 +2,7 @@
 import { defineStore } from "pinia";
 import { reqLogin, reqUserInfo } from '@/apis/user'
 import type { loginForm, loginResponseData } from "@/apis/user/type";
-import { SET_TOKEN, GET_TOKEN } from "@/utils/token";
+import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from "@/utils/token";
 //引入常量路由
 import { routes } from "@/routers";
 
@@ -43,6 +43,14 @@ const useUserStore = defineStore('User', {
                 this.username = result.data.checkUser.username
                 this.avatar = result.data.checkUser.avatar
             }
+        },
+
+        /* 退出登录 */
+        userLogout() {
+            this.token = ''
+            this.username = ''
+            this.avatar = ''
+            REMOVE_TOKEN()
         }
     },
     getters: {

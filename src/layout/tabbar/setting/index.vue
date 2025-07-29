@@ -14,11 +14,7 @@
         </span>
         <template #dropdown>
             <el-dropdown-menu>
-                <el-dropdown-item>Action 1</el-dropdown-item>
-                <el-dropdown-item>Action 2</el-dropdown-item>
-                <el-dropdown-item>Action 3</el-dropdown-item>
-                <el-dropdown-item disabled>Action 4</el-dropdown-item>
-                <el-dropdown-item divided>Action 5</el-dropdown-item>
+                <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
         </template>
     </el-dropdown>
@@ -32,6 +28,8 @@ import { FullScreen, Refresh, Setting, ArrowDown } from '@element-plus/icons-vue
 import { useSettingStore } from '@/store/modules/setting';
 //获取用户相关的小仓库
 import useUserStore from '@/store/modules/users';
+import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 let SettingStore = useSettingStore()
 /* 刷新按钮点击回调 */
@@ -56,6 +54,18 @@ const fullScreen = () => {
 }
 
 const userStore = useUserStore()
+
+/* 退出登录点击的回调 */
+const $router = useRouter()
+const $route = useRoute()
+const logout = () => {
+    //第一件事,向服务器发请求[退出登录接口],告诉服务器本次登录用到的token失效
+    //第二件事,仓库中关于用户相关的数据清除,在仓库做好了
+    //第三件事,跳转到登录页面
+    userStore.userLogout()//调用仓库中的清除数据方法
+    //给跳转的时候给login组件携带query参数,使得下次登录时能够根据query跳转到对应界面
+    $router.push({ path: '/login', query: { redirect: $route.path } })
+}
 </script>
 
 <style scoped></style>

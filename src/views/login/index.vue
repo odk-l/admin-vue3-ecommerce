@@ -32,12 +32,15 @@ import useUserStore from '@/store/modules/users';
 import { useRouter } from 'vue-router';
 import { ElNotification } from 'element-plus';
 import { getTime } from '@/utils/time';
+import { useRoute } from 'vue-router';
 
 const loginForm = reactive({ username: '', password: '' })
 const userStore = useUserStore();
 const $router = useRouter()
 let loading = ref(false)
 const loginForms = ref()
+//路由对象
+let $route = useRoute()
 
 const login = async () => {
     await loginForms.value.validate()
@@ -46,7 +49,10 @@ const login = async () => {
     try {
         //请求成功到首页
         await userStore.userLogin(loginForm)
-        $router.push('/')
+        //为了使点击登录的时候回到原先退出时的那个页面
+        //判断是否有query参数有就往query参数跳转,如果没有就到首页
+        let redirect: any = $route.query.redirect
+        $router.push({ path: redirect || '/' })
         ElNotification({
             type: 'success',
             title: `Hi.${getTime()}好`,
