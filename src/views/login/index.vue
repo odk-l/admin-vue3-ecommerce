@@ -34,7 +34,7 @@ import { ElNotification } from 'element-plus';
 import { getTime } from '@/utils/time';
 import { useRoute } from 'vue-router';
 
-const loginForm = reactive({ username: '', password: '' })
+const loginForm = reactive({ username: 'admin', password: '111111' })
 const userStore = useUserStore();
 const $router = useRouter()
 let loading = ref(false)
@@ -43,11 +43,13 @@ const loginForms = ref()
 let $route = useRoute()
 
 const login = async () => {
+    //自定义校验规则
     await loginForms.value.validate()
     loading.value = true
     //点击登录后,让仓库发请求
     try {
-        //请求成功到首页
+        //请求成功页面跳转
+        console.log('提交登录数据', loginForm)
         await userStore.userLogin(loginForm)
         //为了使点击登录的时候回到原先退出时的那个页面
         //判断是否有query参数有就往query参数跳转,如果没有就到首页

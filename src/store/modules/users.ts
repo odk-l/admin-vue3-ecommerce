@@ -1,7 +1,6 @@
 //用户相关的小仓库
 import { defineStore } from "pinia";
-import { reqLogin, reqUserInfo } from '@/apis/user'
-import type { loginForm, loginResponseData } from "@/apis/user/type";
+import { reqLogin, reqUserInfo, reqLogout } from '@/apis/user';
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from "@/utils/token";
 //引入常量路由
 import { routes } from "@/routers";
@@ -19,18 +18,18 @@ const useUserStore = defineStore('User', {
     actions: {
         // define your actions here
         //async返回promise对象
-        async userLogin(data: loginForm) {
-            let result: loginResponseData = await reqLogin(data);
+        async userLogin(data: any) {
+            let result: any = await reqLogin(data);
             //如果登录成功在pinia仓库中存储token
             console.log(result)
             if (result.code === 200) {
-                this.token = (result.data.token as string)
+                this.token = (result.data as string)
                 //本地存储,持久化
-                SET_TOKEN((result.data.token as string));
+                SET_TOKEN((result.data as string));
                 //保证promise函数返回成功的promise
                 return 'ok';
             } else {
-                return Promise.reject(new Error())
+                return Promise.reject(new Error(result.message))
             }
         },
 
@@ -40,11 +39,11 @@ const useUserStore = defineStore('User', {
             let result = await reqUserInfo()
             //如果获取用户信息成功,存储用户信息
             if (result.code === 200) {
-                this.username = result.data.checkUser.username
-                this.avatar = result.data.checkUser.avatar
+                this.username = result.data.name
+                this.avatar = result.data.avatar
                 return 'ok'
             } else {
-                return Promise.reject('获取用户信息失败')
+                return Promise.reject(new Error(result.data))
             }
         },
 
