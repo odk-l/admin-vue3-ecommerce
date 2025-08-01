@@ -1,9 +1,8 @@
 import SvgIcon from '@/components/Svgicon/index.vue'
 //引入element提供的全部图标
 import * as ElementPlusIconVue from '@element-plus/icons-vue';
-
-
-const allGlobalComponent = { SvgIcon }
+import Category from './Category/index.vue'
+const allGlobalComponent = { SvgIcon, Category }
 
 export default {
     install: (app: any) => {

@@ -15,3 +15,7 @@ export const reqAddOrUpdataTrademark = (data: TradeMark) => {
         return request.post<any, any>('/admin/product/baseTrademark/save', data)
     }
 }
+
+export const reqDeleteTrademark = (id: number) => {
+    return request.delete<any, any>('/admin/product/baseTrademark/remove/' + id)
+}

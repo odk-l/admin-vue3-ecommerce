@@ -24,8 +24,12 @@
                 </el-table-column>
                 <el-table-column label="品牌操作">
                     <template #="{ row }">
-                        <el-button type="primary" size="small" icon="Edit" @click="updateTrademark(row)"></el-button>
-                        <el-button type="primary" size="small" icon="Delete" @click=""></el-button>
+                        <el-button type="primary" size="small" icon="Edit" @click="updateTrademark(row.id)"></el-button>
+                        <el-popconfirm :title="`确定删除吗${row.tmName}?`" width="250px" icon="Delete">
+                            <template #reference>
+                                <el-button @click="deleteTrademark">删除</el-button>
+                            </template>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -38,11 +42,11 @@
         <!-- v-model控制对话框的显示和隐藏 true显示 false隐藏
       title:设置对话框左上角标题 -->
         <el-dialog v-model="dialogFormVisible" :title="trademarkParams.id ? '修改品牌' : '添加品牌'">
-            <el-form style="width: 80%;">
-                <el-form-item label="品牌名称" label-width="80px">
+            <el-form style="width: 80%;" :model="trademarkParams" :rules="rules" ref="formRef">
+                <el-form-item label="品牌名称" label-width="80px" prop="tmName">
                     <el-input placeholder="请输入品牌名称" v-model="trademarkParams.tmName"></el-input>
                 </el-form-item>
-                <el-form-item label="品牌LOGO" label-width="80px">
+                <el-form-item label="品牌LOGO" label-width="80px" prop="logoUrl">
                     <!-- 
                 action:上传图片需要发请求,action后面是请求地址
                  -->
@@ -82,9 +86,10 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 //引入请求
-import { reqHasTrademark, reqAddOrUpdataTrademark } from '@/apis/product/trademark'
+import { reqHasTrademark, reqAddOrUpdataTrademark, reqDeleteTrademark } from '@/apis/product/trademark'
 import type { Records, TradeMark, TradeMarkResponseData } from '@/apis/product/trademark/type'
 import { ElMessage, type UploadProps } from 'element-plus'
+import { requiredNumber } from 'element-plus/es/components/table-v2/src/common.mjs'
 //当前页码
 let pageNo = ref<number>(1)
 //每页展示多少数据
@@ -101,6 +106,10 @@ let trademarkParams = reactive<TradeMark>({
     tmName: '',
     logoUrl: ''
 })
+
+//获取form表单实例
+let formRef = ref()
+
 const getHasTrademark = async (pager = 1) => {
     //为什么可以这样做,因为当刷新或者size变化时pager就是默认值为1,如果是触发的currentchange那么
     //由于这个方法会给事件的回调注入页码,所以pager就是实际跳转的页码
@@ -139,6 +148,8 @@ const changePageSize = () => {
 
 const addTrademark = () => {
     dialogFormVisible.value = true;
+    resetForm()
+    formRef.value?.clearValidate()
 }
 //修改已有品牌按钮
 const updateTrademark = (data: TradeMark) => {
@@ -146,6 +157,7 @@ const updateTrademark = (data: TradeMark) => {
     trademarkParams.logoUrl = data.logoUrl
     trademarkParams.tmName = data.tmName
     trademarkParams.id = data.id
+    formRef.value?.clearValidate()
 }
 
 // 重置表单数据,关闭时重置表单
@@ -161,24 +173,30 @@ const cancel = () => {
 }
 
 const confirm = async () => {
-    dialogFormVisible.value = false
-    let result = await reqAddOrUpdataTrademark(trademarkParams)
-    if (result.code === 200) {
-        dialogFormVisible.value = false
-        ElMessage({
-            type: 'success',
-            message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功'
-        })
-        //更新数据
-        getHasTrademark(trademarkParams.id ? pageNo.value : 1)
-        resetForm()
-    } else {
-        dialogFormVisible.value = false
-        ElMessage({
-            type: 'error',
-            message: '添加失败'
-        })
-        resetForm()
+    //提交之前进行表单校验
+    try {
+        // 修复：正确的表单验证方法
+        await formRef.value.validate()
+
+        let result = await reqAddOrUpdataTrademark(trademarkParams)
+        if (result.code === 200) {
+            ElMessage({
+                type: 'success',
+                message: trademarkParams.id ? '修改品牌成功' : '添加品牌成功'
+            })
+            //更新数据
+            getHasTrademark(trademarkParams.id ? pageNo.value : 1)
+            dialogFormVisible.value = false
+            resetForm()
+        } else {
+            ElMessage({
+                type: 'error',
+                message: result.message || '操作失败'
+            })
+        }
+    } catch (error) {
+        console.log('表单验证失败:', error)
+        // 验证失败时不显示额外的错误信息，让表单自己显示验证错误
     }
 }
 
@@ -211,6 +229,7 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
     //收集上传图片的地址,添加一个新的品牌的时候带给服务
     trademarkParams.logoUrl = response.data
+    formRef.value.clearValidate('logoUrl')
 }
 
 const handleAvatarError: UploadProps['onError'] = (error, uploadFile) => {
@@ -231,6 +250,49 @@ const handleAvatarError: UploadProps['onError'] = (error, uploadFile) => {
         message: errorMessage,
         duration: 5000
     })
+}
+
+const validatorTmName = (rule: any, value: any, callBack: any) => {
+    if (value && value.trim().length >= 2) {
+        callBack()
+    } else {
+        callBack(new Error('品牌名称大于等于两个字符'))
+    }
+}
+
+const validatorlogoUrl = (rule: any, value: any, callBack: any) => {
+    if (value) {
+        callBack()
+    } else {
+        callBack(new Error('图片不能为空'))
+    }
+}
+
+const rules = {
+    tmName: [
+        { required: true, validator: validatorTmName, trigger: 'blur' }
+    ],
+    logoUrl: [
+        { required: true, validator: validatorlogoUrl }
+    ]
+}
+
+//删除已有的品牌
+const deleteTrademark = async (id: number) => {
+    let result = await reqDeleteTrademark(id);
+    if (result.code === 200) {
+        ElMessage({
+            type: 'success',
+            message: '删除品牌成功'
+        })
+        //再次获取已有品牌数据
+        getHasTrademark(trademarkArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    } else {
+        ElMessage({
+            type: 'error',
+            message: '删除品牌失败'
+        })
+    }
 }
 </script>
 
