@@ -99,7 +99,7 @@ watch(() => CategoryStore.c3Id, () => {
 const getAttr = async () => {
     const { c1Id, c2Id, c3Id } = CategoryStore;
     let result: AttrResponseData = await reqAttr(c1Id, c2Id, c3Id)
-    console.log(result.data)
+    /* console.log(result.data) */
     if (result.code === 200) {
         attrArr.value = result.data
     }
