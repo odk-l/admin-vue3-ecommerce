@@ -26,3 +26,8 @@ export const reqAddOrUpdateAttr = (data: Attr) => {
     return request.post<any, any>('/admin/product/saveAttrInfo', data)
 }
 
+//已有属性删除
+export const reqRemoveAttr = (attrId: number) => {
+    return request.delete<any, any>(`admin/product/deleteAttr/${attrId}`)
+}
+

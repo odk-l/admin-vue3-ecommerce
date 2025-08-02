@@ -14,9 +14,14 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="操作" width="120px">
-                        <template #="{ row }"><!-- row代表已有的属性对象 -->
-                            <el-button type="primary" size="small" icon="Edit" @click="updateAttr()"></el-button>
-                            <el-button type="primary" size="small" icon="Delete" @click="deleteAttr"></el-button>
+                        <template #="{ row, $index }"><!-- row代表已有的属性对象 -->
+                            <el-button type="primary" size="small" icon="Edit"
+                                @click="updateAttr(row, $index)"></el-button>
+                            <el-popconfirm title="确定删除吗?" @confirm="deleteAttr(row.id)">
+                                <template #reference>
+                                    <el-button type="primary" size="small" icon="Delete"></el-button>
+                                </template>
+                            </el-popconfirm>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -42,7 +47,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column label="属性值操作">
-                        <template #="{ row, index }">
+                        <template #="{ index }">
                             <el-button type="primary" size="small" icon="Delete"
                                 @click="attrParams.attrValueList.splice(index, 1)"></el-button>
                         </template>
@@ -59,11 +64,12 @@
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
 
-import { reqAttr, reqAddOrUpdateAttr } from '@/apis/product/attr';
+import { reqAttr, reqAddOrUpdateAttr, reqRemoveAttr } from '@/apis/product/attr';
 import useCategoryStore from '@/store/modules/category';
 import type { AttrResponseData, Attr } from '@/apis/product/attr/type';
-import { ref, nextTick } from 'vue';
+import { ref, nextTick, onBeforeMount } from 'vue';
 import { ElMessage } from 'element-plus';
+import { ro } from 'element-plus/lib/locale/index.js';
 
 
 let CategoryStore = useCategoryStore()
@@ -99,12 +105,31 @@ const getAttr = async () => {
     }
 }
 
-const updateAttr = () => {
+const updateAttr = (row: Attr, index: number) => {
     scene.value = !scene.value;
+    //进行对象合并
+    //对row进行深拷贝
+    Object.assign(attrParams, JSON.parse(JSON.stringify(row)))
 }
 
-const deleteAttr = () => {
+const deleteAttr = (id: number) => {
+    let result: any = removeAttr(id);
+    if (result.code === 200) {
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        getAttr()
+    } else {
+        ElMessage({
+            type: 'error',
+            message: '删除失败'
+        })
+    }
+}
 
+const removeAttr = async (id: number) => {
+    return await reqRemoveAttr(id)
 }
 
 const addAttr = () => {
@@ -193,6 +218,12 @@ const toEdit = (data: any, $index: number) => {
         inputArr.value[$index].focus()
     })
 }
+
+//路由组件销毁的时候,把仓库分类相关的数据清空
+onBeforeMount(() => {
+    //清空仓库数据
+    CategoryStore.$reset()
+})
 </script>
 
 <style scoped></style>
