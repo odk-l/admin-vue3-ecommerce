@@ -1,7 +1,7 @@
 //书写属性api的文件
 
 import request from "@/utils/request";
-import type { AttrResponseData, CategoryResponseData } from "./type";
+import type { AttrResponseData, CategoryResponseData, Attr } from "./type";
 
 export const reqC1 = () => {
     return request.get<any, CategoryResponseData>('/admin/product/getCategory1')
@@ -19,5 +19,10 @@ export const reqC3 = (Category2Id: number | string) => {
 
 export const reqAttr = (Category1Id: number | string, Category2Id: number | string, Category3Id: number | string) => {
     return request.get<any, AttrResponseData>(`/admin/product/attrInfoList/${Category1Id}/${Category2Id}/${Category3Id}`)
+}
+
+//给某个三级分类添加或者修改属性
+export const reqAddOrUpdateAttr = (data: Attr) => {
+    return request.post<any, any>('/admin/product/saveAttrInfo', data)
 }
 

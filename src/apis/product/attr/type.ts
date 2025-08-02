@@ -15,24 +15,24 @@ export interface categoryObj {
 }
 
 
-
 export interface CategoryResponseData extends responseData {
     data: categoryObj[],
 }
 
 
 export interface Attr {
-    id: number,
+    id?: number,
     attrName: string,
-    categoryId: number,
+    categoryId?: number | string,
     categoryLevel: number,
     attrValueList: AttrValueList
 }
 
 export interface AttrValue {
-    id: number,
+    id?: number,
     valueName: string,
-    attrId: number
+    attrId?: number,
+    flag?: boolean
 }
 
 export type AttrValueList = AttrValue[]
