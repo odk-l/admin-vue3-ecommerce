@@ -12,7 +12,8 @@
                         <el-table-column label="SPU描述" prop="description" show-overflow-tooltip></el-table-column>
                         <el-table-column label="SPU操作" width="120px">
                             <template #="{ row }"><!-- row代表已有的属性对象 -->
-                                <el-button type="primary" size="small" icon="Plus" title="添加SKU"></el-button>
+                                <el-button type="primary" size="small" icon="Plus" title="添加SKU"
+                                    @click="addSku"></el-button>
                                 <el-button type="primary" size="small" icon="Edit" @click="updateSpu(row)"
                                     title="修改SKU"></el-button>
                                 <el-popconfirm title="确定删除吗?" @confirm="">
@@ -30,7 +31,7 @@
                 </el-card>
             </div>
             <spuForm ref="spu" v-show="scene === 0" @changeScene="changeScene"></spuForm>
-            <skuForm v-show="scene === 2"></skuForm>
+            <skuForm v-show="scene === 2" @changeScene="changeScene"></skuForm>
         </el-card>
     </div>
 </template>
@@ -106,6 +107,10 @@ const changeScene = ({ flag, params }: any) => {
         //添加留在第一页
         getSPU()
     }
+}
+
+const addSku = () => {
+    scene.value = 2
 }
 </script>
 
