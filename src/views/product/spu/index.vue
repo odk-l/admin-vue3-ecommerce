@@ -97,6 +97,7 @@ watch(() => CategoryStore.c3Id, () => {
 //对于当前页码发生变化的自定义时间,组件pagination向父组件回传了数据(当前页码)不太明白
 const changePageNo = () => {
     //当前页码变化
+
     getSPU(pageNo.value)
 }
 //当下拉菜单数值发生变化时会触发此方法,组件pagination向父组件回传了数据(会将下拉菜单选中的数值返回)
