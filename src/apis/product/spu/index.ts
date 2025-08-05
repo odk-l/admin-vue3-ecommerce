@@ -5,6 +5,7 @@ import type {
     AllTradeMark,
     SpuHasImg,
     HasSaleAttrResponseData,
+    SkuData,
 } from './type'
 enum API {
     //获取已有的SPU的数据
@@ -61,7 +62,7 @@ export const reqAddOrUpdateSpu = (data: any) => {
     }
 }
 //添加SKU的请求方法
-export const reqAddSku = (data: any) =>
+export const reqAddSku = (data: SkuData) =>
     request.post<any, any>(API.ADDSKU_URL, data)
 
 //获取SKU数据

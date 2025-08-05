@@ -13,7 +13,7 @@
                         <el-table-column label="SPU操作" width="120px">
                             <template #="{ row }"><!-- row代表已有的属性对象 -->
                                 <el-button type="primary" size="small" icon="Plus" title="添加SKU"
-                                    @click="addSku"></el-button>
+                                    @click="addSku(row)"></el-button>
                                 <el-button type="primary" size="small" icon="Edit" @click="updateSpu(row)"
                                     title="修改SKU"></el-button>
                                 <el-popconfirm title="确定删除吗?" @confirm="">
@@ -31,7 +31,7 @@
                 </el-card>
             </div>
             <spuForm ref="spu" v-show="scene === 0" @changeScene="changeScene"></spuForm>
-            <skuForm v-show="scene === 2" @changeScene="changeScene"></skuForm>
+            <skuForm ref="sku" v-show="scene === 2" @changeScene="changeScene"></skuForm>
         </el-card>
     </div>
 </template>
@@ -58,6 +58,7 @@ let CategoryStore = useCategoryStore()
 let total = ref<number>(0)
 
 const spu = ref()
+const sku = ref()
 
 const getSPU = async (pager = 1) => {
     pageNo.value = pager
@@ -109,7 +110,8 @@ const changeScene = ({ flag, params }: any) => {
     }
 }
 
-const addSku = () => {
+const addSku = (row: any) => {
+    sku.value.initSkuData(CategoryStore.c1Id, CategoryStore.c2Id, row)
     scene.value = 2
 }
 </script>
