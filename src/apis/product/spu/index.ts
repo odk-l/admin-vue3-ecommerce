@@ -71,4 +71,4 @@ export const reqSkuList = (spuId: number | string) =>
 
 //删除已有的SPU
 export const reqRemoveSpu = (spuId: number | string) =>
-    request.delete<any, any>(API.REMOVESPU_URL + spuId)
+    request.delete<any, SkuInfoData>(API.REMOVESPU_URL + spuId)
