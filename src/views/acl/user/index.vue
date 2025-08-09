@@ -101,12 +101,13 @@
 </template>
 
 <script setup lang="ts">
-import type { User, UserResponseData } from '@/apis/acl/user/type';
-import { reqAddOrUpdateUser, reqUserInfo } from '@/apis/acl/user';
+import type { AllRole, AllRoleResponseData, SetRoleData, User, UserResponseData } from '@/apis/acl/user/type';
+import { reqAddOrUpdateUser, reqAllRole, reqRemoveUser, reqSelectUser, reqSetUserRole, reqUserInfo } from '@/apis/acl/user';
 import { reactive, ref, onMounted, nextTick } from 'vue';
 import { ElMessage } from 'element-plus';
+import { useSettingStore } from '@/store/modules/setting';
 
-
+//定义响应式数据收集用户输入进来的关键字
 let keyword = ref<string>('')
 let drawer = ref<boolean>(false)
 let drawer1 = ref<boolean>(false)
@@ -120,6 +121,12 @@ let pageSize = ref<number>(3)
 let total = ref<number>(0)
 let userArr = ref<any>([])
 let formRef = ref<any>()
+let allRole = ref<AllRole>([])
+let userRole = ref<AllRole>([])
+let selectIdArr = ref<any[]>([])
+let settingStore = useSettingStore()
+
+
 
 const getHasUser = async (pager = 1) => {
     pageNo.value = pager
@@ -158,23 +165,6 @@ const updateUser = (row: User) => {
         formRef.value.clearValidate('name');
     });
 }
-
-
-const search = async () => {
-    drawer.value = true
-    let result: any = await reqUserInfo
-    if (result.code === 200) {
-        userParams = result.data
-    } else {
-
-    }
-
-}
-
-const reset = () => {
-
-}
-
 
 const save = async () => {
     drawer.value = false
@@ -231,6 +221,89 @@ const rules = {
     name: [{ required: true, trigger: 'blur', validator: validatorname }],
     //用户的密码
     password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
+}
+
+const setRole = async (row: User) => {
+    Object.assign(userParams, row);
+    let result: AllRoleResponseData = await reqAllRole((userParams.id as number))
+    if (result.code === 200) {
+        //存储全部职位
+        allRole.value = result.data.allRolesList
+        //存储已有职位
+        userRole.value = result.data.assignRoles
+        //drawer1显示
+        drawer1.value = true
+    }
+}
+
+//收集顶部复选框全选数据
+const checkAll = ref<boolean>(false)
+//控制顶部全选复选框不确定的样式
+const isIndeterminate = ref<boolean>(true)
+//顶部全选框的change事件
+const handleCheckAllChange = (val: boolean) => {
+    userRole.value = val ? allRole.value : []
+    isIndeterminate.value = false
+}
+//底部全部的复选框的change事件
+const handleCheckedCitiesChange = (value: string[]) => {
+    //顶部复选框勾选的数据
+    checkAll.value = value.length === allRole.value.length
+}
+//分配职位确定按钮
+const confirmClick = async () => {
+    let data: SetRoleData = {
+        userId: (userParams.id as number),
+        roleIdList: userRole.value.map(item => {
+            return (item.id as number)
+        })
+    }
+    let result: any = await reqSetUserRole(data)
+    if (result.code === 200) {
+        ElMessage({ type: 'success', message: '分配职务成功' })
+        drawer1.value = false
+        getHasUser(pageNo.value)
+    }
+}
+
+const deleteUser = async (userId: number) => {
+    let result = await reqRemoveUser(userId)
+    if (result.code === 200) {
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    }
+}
+
+const selectChange = (value: any) => {
+    selectIdArr.value = value
+}
+
+const deleteSelectUser = async () => {
+    //整理批量删除的参数
+    let idList: any = selectIdArr.value.map(item => {
+        return item.id
+    });
+    //批量删除的请求
+    let result: any = await reqSelectUser(idList)
+    if (result.code === 200) {
+        ElMessage({
+            type: 'success',
+            message: '删除成功'
+        })
+        getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    }
+}
+
+const search = async () => {
+    await getHasUser()
+    keyword.value = ''
+}
+
+const reset = () => {
+    settingStore.refresh = !settingStore.refresh
 }
 
 onMounted(() => {
